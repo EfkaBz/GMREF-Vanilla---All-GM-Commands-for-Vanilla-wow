@@ -1,0 +1,9 @@
+## Interface: 20400
+## Title: |cffC8A84BGMRef|r — Référence GM
+## Notes: Référence complète des commandes GM cMaNGOS. /gmref pour ouvrir.
+## Author: Alexis
+## Version: 1.1.0
+## SavedVariables: GMRef_Settings
+
+GMRef_Data.lua
+GMRef_Core.lua

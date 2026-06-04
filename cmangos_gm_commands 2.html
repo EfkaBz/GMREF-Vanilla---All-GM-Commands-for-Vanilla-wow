@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>cMaNGOS — Commandes GM</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#c8a84b;--gold-light:#e8c97a;--gold-dim:#7a6028;--bg:#0a0905;--bg2:#100e08;--bg3:#16120a;--bg4:#1e1810;--border:rgba(200,168,75,0.18);--border-strong:rgba(200,168,75,0.4);--text:#d4c49a;--text-dim:#7a6e52;--text-bright:#f0e4c0;--green:#4a9e6b;--red:#9e4a4a;--blue:#4a6a9e;--radius:4px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Crimson Pro',Georgia,serif;background:var(--bg);color:var(--text);min-height:100vh;background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(200,168,75,0.06) 0%,transparent 70%),url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8a84b' fill-opacity='0.025'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+header{text-align:center;padding:3.5rem 2rem 2.5rem;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(200,168,75,0.04) 0%,transparent 100%)}
+.header-ornament{display:flex;align-items:center;justify-content:center;gap:1.2rem;margin-bottom:1rem}
+.ornament-line{height:1px;width:80px;background:linear-gradient(90deg,transparent,var(--gold-dim),var(--gold))}
+.ornament-line.right{background:linear-gradient(90deg,var(--gold),var(--gold-dim),transparent)}
+.ornament-diamond{width:8px;height:8px;background:var(--gold);transform:rotate(45deg);box-shadow:0 0 12px rgba(200,168,75,0.6)}
+h1{font-family:'Cinzel',serif;font-size:clamp(1.6rem,4vw,2.6rem);font-weight:700;color:var(--gold-light);letter-spacing:0.12em;text-shadow:0 0 40px rgba(200,168,75,0.3);margin-bottom:0.4rem}
+.subtitle{font-size:1rem;color:var(--text-dim);letter-spacing:0.06em;font-style:italic}
+
+/* SEARCH */
+.search-bar{display:flex;justify-content:center;padding:1rem 2rem 0;background:var(--bg2)}
+#searchInput{width:100%;max-width:500px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem 1rem;color:var(--text-bright);font-family:'Crimson Pro',serif;font-size:0.95rem;outline:none;transition:border-color 0.2s}
+#searchInput:focus{border-color:var(--gold-dim)}
+#searchInput::placeholder{color:var(--text-dim);font-style:italic}
+
+/* TABS */
+.tabs-wrapper{display:flex;justify-content:center;gap:0;padding:0.8rem 2rem 0;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:100;flex-wrap:wrap}
+.tab-btn{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.1em;padding:0.6rem 1.1rem;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-dim);cursor:pointer;transition:all 0.2s;text-transform:uppercase}
+.tab-btn:hover{color:var(--gold)}
+.tab-btn.active{color:var(--gold-light);border-bottom-color:var(--gold);background:rgba(200,168,75,0.05)}
+
+main{max-width:1160px;margin:0 auto;padding:2.5rem 2rem 4rem}
+.section{display:none}.section.active{display:block}
+
+/* CMD GROUPS */
+.cmd-group{margin-bottom:2rem;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--bg2)}
+.cmd-group-title{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);padding:0.6rem 1.2rem;background:rgba(200,168,75,0.06);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.8rem}
+.cmd-group-title::before{content:'';display:inline-block;width:4px;height:4px;background:var(--gold);transform:rotate(45deg);flex-shrink:0}
+.cmd-row{display:grid;grid-template-columns:260px 1fr;border-bottom:1px solid rgba(200,168,75,0.07);transition:background 0.15s}
+.cmd-row:last-child{border-bottom:none}
+.cmd-row:hover{background:rgba(200,168,75,0.04)}
+.cmd-row.hidden{display:none}
+.cmd-code{font-family:'Courier New',monospace;font-size:0.82rem;padding:0.6rem 1.2rem;color:var(--green);border-right:1px solid rgba(200,168,75,0.07);word-break:break-all;line-height:1.4}
+.cmd-desc{font-size:0.92rem;padding:0.6rem 1.2rem;color:var(--text);line-height:1.4}
+.cmd-level{font-family:'Cinzel',serif;font-size:0.58rem;color:var(--text-dim);padding:0 4px;border:1px solid rgba(200,168,75,0.2);border-radius:2px;margin-left:auto;white-space:nowrap;align-self:center;margin-right:0.5rem}
+
+/* REPUTATION */
+.rep-section-label{display:flex;align-items:center;gap:1rem;margin:2rem 0 1rem}
+.rep-badge{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.3rem 0.9rem;border-radius:2px;border:1px solid}
+.rep-badge.alliance{color:#7aaddb;border-color:rgba(122,173,219,0.4);background:rgba(122,173,219,0.08)}
+.rep-badge.horde{color:#db7a7a;border-color:rgba(219,122,122,0.4);background:rgba(219,122,122,0.08)}
+.rep-badge.neutral{color:var(--gold);border-color:var(--border);background:rgba(200,168,75,0.06)}
+.rep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:6px;margin-bottom:0.5rem}
+.rep-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.55rem 0.85rem;transition:border-color 0.15s,background 0.15s;cursor:default}
+.rep-card:hover{border-color:var(--border-strong);background:var(--bg4)}
+.rep-name{font-size:0.88rem;color:var(--text-bright);margin-bottom:2px}
+.rep-id{font-family:'Courier New',monospace;font-size:0.75rem;color:var(--text-dim)}
+
+/* MACROS */
+.macro-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem}
+.macro-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.macro-header{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1rem;background:rgba(200,168,75,0.06);border-bottom:1px solid var(--border)}
+.macro-title{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold)}
+.copy-btn{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.7rem;background:none;border:1px solid var(--border-strong);border-radius:2px;color:var(--text-dim);cursor:pointer;transition:all 0.15s}
+.copy-btn:hover{color:var(--gold);border-color:var(--gold);background:rgba(200,168,75,0.08)}
+.copy-btn.copied{color:var(--green);border-color:var(--green)}
+.macro-body{font-family:'Courier New',monospace;font-size:0.8rem;color:var(--green);padding:0.9rem 1rem;line-height:1.9;white-space:pre}
+
+/* PROFESSIONS */
+.prof-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+.prof-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem 1rem;display:flex;justify-content:space-between;align-items:center;transition:border-color 0.15s}
+.prof-card:hover{border-color:var(--border-strong)}
+.prof-name{font-size:0.95rem;color:var(--text-bright)}
+.prof-ids{font-family:'Courier New',monospace;font-size:0.75rem;color:var(--text-dim);text-align:right;line-height:1.7}
+.prof-ids span{display:block}
+.prof-ids .id-label{color:var(--gold-dim);font-size:0.68rem}
+.prof-section-label{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin:1.4rem 0 0.6rem}
+
+/* NOTE */
+.note{font-size:0.88rem;color:var(--text-dim);padding:0.7rem 1rem;background:rgba(200,168,75,0.04);border-left:2px solid var(--gold-dim);border-radius:0 var(--radius) var(--radius) 0;margin-bottom:1.8rem;font-style:italic}
+.note code{font-family:'Courier New',monospace;color:var(--green);font-style:normal;font-size:0.85rem}
+
+/* SEARCH RESULTS */
+#searchResults{display:none}
+#searchResults .cmd-group{margin-bottom:1rem}
+.no-results{text-align:center;color:var(--text-dim);padding:3rem;font-style:italic}
+
+footer{text-align:center;padding:2rem;color:var(--text-dim);font-size:0.8rem;border-top:1px solid var(--border);font-style:italic}
+
+@media(max-width:600px){.cmd-row{grid-template-columns:1fr}.cmd-code{border-right:none;border-bottom:1px solid rgba(200,168,75,0.07)}.macro-grid{grid-template-columns:1fr}.tab-btn{font-size:0.58rem;padding:0.5rem 0.7rem}main{padding:1.5rem 1rem 3rem}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.section.active{animation:fadeIn 0.2s ease}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-ornament">
+    <div class="ornament-line"></div><div class="ornament-diamond"></div><div class="ornament-line right"></div>
+  </div>
+  <h1>cMaNGOS — Commandes GM</h1>
+  <p class="subtitle">Référence complète · TBC 2.4.3 (build 8606) · Traduction française</p>
+</header>
+
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="Rechercher une commande…" oninput="doSearch(this.value)">
+</div>
+
+<div class="tabs-wrapper">
+  <button class="tab-btn active"  onclick="showTab('general',this)">Générales</button>
+  <button class="tab-btn"         onclick="showTab('tp',this)">Téléportation</button>
+  <button class="tab-btn"         onclick="showTab('combat',this)">Combat &amp; GM</button>
+  <button class="tab-btn"         onclick="showTab('npc',this)">NPC &amp; Monde</button>
+  <button class="tab-btn"         onclick="showTab('account',this)">Compte &amp; Serveur</button>
+  <button class="tab-btn"         onclick="showTab('rep',this)">Réputations</button>
+  <button class="tab-btn"         onclick="showTab('macros',this)">Macros rép.</button>
+  <button class="tab-btn"         onclick="showTab('professions',this)">Professions</button>
+</div>
+
+<main>
+<div id="searchResults"></div>
+
+<!-- ========== GÉNÉRALES ========== -->
+<div id="tab-general" class="section active">
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Personnage &amp; Niveau</div>
+    <div class="cmd-row"><div class="cmd-code">.levelup [n]</div><div class="cmd-desc">Augmente le niveau de la cible de n niveaux</div></div>
+    <div class="cmd-row"><div class="cmd-code">.character level [nom] [n]</div><div class="cmd-desc">Définit le niveau exact d'un personnage (en ligne ou hors ligne)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.reset level [nom]</div><div class="cmd-desc">Réinitialise le niveau à 1 (stats et talents inclus)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.reset talents [nom]</div><div class="cmd-desc">Réinitialise tous les talents (spec actuelle) du personnage ou de son pet</div></div>
+    <div class="cmd-row"><div class="cmd-code">.reset specs [nom]</div><div class="cmd-desc">Supprime tous les talents des deux specs</div></div>
+    <div class="cmd-row"><div class="cmd-code">.reset spells [nom]</div><div class="cmd-desc">Supprime tous les sorts non-originaux du grimoire</div></div>
+    <div class="cmd-row"><div class="cmd-code">.reset stats [nom]</div><div class="cmd-desc">Recalcule toutes les stats au niveau actuel</div></div>
+    <div class="cmd-row"><div class="cmd-code">.reset honor [nom]</div><div class="cmd-desc">Réinitialise toutes les données d'honneur du personnage</div></div>
+    <div class="cmd-row"><div class="cmd-code">.maxskill</div><div class="cmd-desc">Monte toutes les compétences au maximum pour le niveau actuel</div></div>
+    <div class="cmd-row"><div class="cmd-code">.save</div><div class="cmd-desc">Sauvegarde le personnage actuel</div></div>
+    <div class="cmd-row"><div class="cmd-code">.saveall</div><div class="cmd-desc">Sauvegarde tous les personnages en ligne</div></div>
+    <div class="cmd-row"><div class="cmd-code">.character rename [nom]</div><div class="cmd-desc">Marque le personnage pour renommage à la prochaine connexion</div></div>
+    <div class="cmd-row"><div class="cmd-code">.character customize [nom]</div><div class="cmd-desc">Marque le personnage pour personnalisation à la prochaine connexion</div></div>
+    <div class="cmd-row"><div class="cmd-code">.repairitems</div><div class="cmd-desc">Répare tous les objets du personnage ciblé</div></div>
+    <div class="cmd-row"><div class="cmd-code">.pinfo [nom]</div><div class="cmd-desc">Affiche les informations de compte du joueur ciblé</div></div>
+    <div class="cmd-row"><div class="cmd-code">.guid</div><div class="cmd-desc">Affiche le GUID de la cible sélectionnée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.distance [nom]</div><div class="cmd-desc">Affiche la distance entre vous et la cible / le joueur nommé</div></div>
+    <div class="cmd-row"><div class="cmd-code">.gps [nom]</div><div class="cmd-desc">Affiche coordonnées X/Y/Z, orientation, map ID et zone ID de la cible</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Objets &amp; Sorts</div>
+    <div class="cmd-row"><div class="cmd-code">.additem [ID]</div><div class="cmd-desc">Ajoute un objet à la cible (le lien chat fonctionne aussi)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.additem [ID] [n]</div><div class="cmd-desc">Ajoute n exemplaires de l'objet</div></div>
+    <div class="cmd-row"><div class="cmd-code">.additemset [ID]</div><div class="cmd-desc">Ajoute un set complet d'équipement</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup item [nom]</div><div class="cmd-desc">Recherche un objet par nom (anglais) et retourne ses IDs</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup itemset [nom]</div><div class="cmd-desc">Recherche un set d'objets par nom</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup spell [nom]</div><div class="cmd-desc">Recherche un sort par nom et retourne ses IDs</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup skill [nom]</div><div class="cmd-desc">Recherche une compétence par nom</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup quest [nom]</div><div class="cmd-desc">Recherche une quête par nom et retourne ses IDs</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup creature [nom]</div><div class="cmd-desc">Recherche une créature par nom</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup object [nom]</div><div class="cmd-desc">Recherche un objet du monde (gameobject) par nom</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup faction [nom]</div><div class="cmd-desc">Recherche une faction par nom et retourne son ID</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup area [nom]</div><div class="cmd-desc">Recherche une zone par nom et retourne son ID</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup tele [nom]</div><div class="cmd-desc">Recherche un lieu de téléportation disponible</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup taxinode [nom]</div><div class="cmd-desc">Recherche un nœud de taxi par nom</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup title [nom]</div><div class="cmd-desc">Recherche un titre par nom et retourne son ID</div></div>
+    <div class="cmd-row"><div class="cmd-code">.learn [ID]</div><div class="cmd-desc">Apprend le sort associé à cet ID</div></div>
+    <div class="cmd-row"><div class="cmd-code">.learn [ID] all</div><div class="cmd-desc">Apprend toutes les rangs du sort</div></div>
+    <div class="cmd-row"><div class="cmd-code">.learn all</div><div class="cmd-desc">Apprend un large ensemble de sorts utiles (admin)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.learn all_crafts</div><div class="cmd-desc">Apprend toutes les professions et recettes</div></div>
+    <div class="cmd-row"><div class="cmd-code">.learn all_default [nom]</div><div class="cmd-desc">Apprend tous les sorts de départ race/classe + récompenses de quêtes</div></div>
+    <div class="cmd-row"><div class="cmd-code">.learn all_gm</div><div class="cmd-desc">Apprend tous les sorts par défaut pour les GMs</div></div>
+    <div class="cmd-row"><div class="cmd-code">.learn all_lang</div><div class="cmd-desc">Apprend toutes les langues</div></div>
+    <div class="cmd-row"><div class="cmd-code">.learn all_myclass</div><div class="cmd-desc">Apprend tous les sorts et talents disponibles pour sa classe</div></div>
+    <div class="cmd-row"><div class="cmd-code">.learn all_myspells</div><div class="cmd-desc">Apprend tous les sorts (hors talents) disponibles pour sa classe</div></div>
+    <div class="cmd-row"><div class="cmd-code">.learn all_mytalents</div><div class="cmd-desc">Apprend tous les talents disponibles pour sa classe</div></div>
+    <div class="cmd-row"><div class="cmd-code">.learn all_recipes [profession]</div><div class="cmd-desc">Apprend toutes les recettes d'une profession et monte le skill au max</div></div>
+    <div class="cmd-row"><div class="cmd-code">.unlearn [ID]</div><div class="cmd-desc">Désapprend le sort (ajouter "all" pour tous les rangs)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.list talents</div><div class="cmd-desc">Affiche la liste de tous les talents connus du personnage</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Quêtes</div>
+    <div class="cmd-row"><div class="cmd-code">.quest add [ID]</div><div class="cmd-desc">Ajoute la quête au journal du personnage</div></div>
+    <div class="cmd-row"><div class="cmd-code">.quest complete [ID]</div><div class="cmd-desc">Marque tous les objectifs comme complétés (lien chat OK)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.quest remove [ID]</div><div class="cmd-desc">Retire la quête du journal (état non-complété, non-actif)</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Guildes</div>
+    <div class="cmd-row"><div class="cmd-code">.guild create [leader] "[nom]"</div><div class="cmd-desc">Crée une guilde avec le joueur ciblé/nommé comme leader</div></div>
+    <div class="cmd-row"><div class="cmd-code">.guild delete "[nom]"</div><div class="cmd-desc">Supprime la guilde</div></div>
+    <div class="cmd-row"><div class="cmd-code">.guild invite [joueur] "[guilde]"</div><div class="cmd-desc">Invite un joueur dans une guilde</div></div>
+    <div class="cmd-row"><div class="cmd-code">.guild uninvite [joueur]</div><div class="cmd-desc">Retire un joueur de sa guilde</div></div>
+    <div class="cmd-row"><div class="cmd-code">.guild rank [joueur] [rang]</div><div class="cmd-desc">Définit le rang du joueur dans la guilde</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Titres &amp; Honneur</div>
+    <div class="cmd-row"><div class="cmd-code">.titles add [ID]</div><div class="cmd-desc">Ajoute un titre à la liste des titres connus</div></div>
+    <div class="cmd-row"><div class="cmd-code">.titles current [ID]</div><div class="cmd-desc">Définit le titre actif du joueur</div></div>
+    <div class="cmd-row"><div class="cmd-code">.titles remove [ID]</div><div class="cmd-desc">Retire un titre de la liste</div></div>
+    <div class="cmd-row"><div class="cmd-code">.honor add [montant]</div><div class="cmd-desc">Ajoute un montant d'honneur (gains du jour) au joueur</div></div>
+    <div class="cmd-row"><div class="cmd-code">.honor addkill</div><div class="cmd-desc">Ajoute l'unité ciblée comme kill PvP du jour</div></div>
+    <div class="cmd-row"><div class="cmd-code">.flusharenapoints</div><div class="cmd-desc">Distribue les points d'arène selon les classements et commence une nouvelle semaine</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Instances</div>
+    <div class="cmd-row"><div class="cmd-code">.instance listbinds</div><div class="cmd-desc">Liste tous les locks d'instance du joueur ciblé</div></div>
+    <div class="cmd-row"><div class="cmd-code">.instance unbind all</div><div class="cmd-desc">Supprime tous les locks d'instance du joueur ciblé</div></div>
+    <div class="cmd-row"><div class="cmd-code">.instance unbind [mapid]</div><div class="cmd-desc">Supprime uniquement le lock de la map spécifiée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.instance stats</div><div class="cmd-desc">Affiche des statistiques sur les instances actives</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Divers</div>
+    <div class="cmd-row"><div class="cmd-code">.npc info</div><div class="cmd-desc">Affiche toutes les infos du NPC ciblé (GUID, faction, entry, flags…)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.nameannounce [texte]</div><div class="cmd-desc">Envoie une annonce serveur visible de tous, avec votre nom</div></div>
+    <div class="cmd-row"><div class="cmd-code">.announce [texte]</div><div class="cmd-desc">Envoie un message global à tous les joueurs en ligne (chat log)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.notify [texte]</div><div class="cmd-desc">Envoie un message global affiché à l'écran de tous les joueurs</div></div>
+    <div class="cmd-row"><div class="cmd-code">.send mail [joueur] "[sujet]" "[texte]"</div><div class="cmd-desc">Envoie un mail à un joueur</div></div>
+    <div class="cmd-row"><div class="cmd-code">.send money [joueur] "[sujet]" "[texte]" [montant]</div><div class="cmd-desc">Envoie de l'argent par mail à un joueur</div></div>
+    <div class="cmd-row"><div class="cmd-code">.send items [joueur] "[sujet]" "[texte]" [itemid:count]</div><div class="cmd-desc">Envoie des objets par mail à un joueur (max 12 stacks)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.mailbox</div><div class="cmd-desc">Affiche le contenu de votre boîte mail</div></div>
+    <div class="cmd-row"><div class="cmd-code">.bank</div><div class="cmd-desc">Ouvre votre inventaire de banque</div></div>
+    <div class="cmd-row"><div class="cmd-code">.stable</div><div class="cmd-desc">Ouvre votre écurie (pets de chasseur)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.commands</div><div class="cmd-desc">Affiche toutes les commandes disponibles pour votre niveau GM</div></div>
+    <div class="cmd-row"><div class="cmd-code">.help [commande]</div><div class="cmd-desc">Affiche l'aide détaillée d'une commande</div></div>
+    <div class="cmd-row"><div class="cmd-code">.start</div><div class="cmd-desc">Vous téléporte à la zone de départ de votre personnage</div></div>
+    <div class="cmd-row"><div class="cmd-code">.dismount</div><div class="cmd-desc">Vous désmonture si vous êtes en monture</div></div>
+  </div>
+
+</div>
+
+<!-- ========== TÉLÉPORTATION ========== -->
+<div id="tab-tp" class="section">
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Téléportation de base</div>
+    <div class="cmd-row"><div class="cmd-code">.tele [nom]</div><div class="cmd-desc">Téléporte vers un lieu nommé (nom en anglais)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.tele name [joueur] [lieu]</div><div class="cmd-desc">Téléporte un autre joueur vers un lieu (peut être hors ligne)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.tele group [lieu]</div><div class="cmd-desc">Téléporte le joueur ciblé et tout son groupe vers un lieu</div></div>
+    <div class="cmd-row"><div class="cmd-code">.tele add [nom]</div><div class="cmd-desc">Enregistre votre position actuelle comme destination de .tele</div></div>
+    <div class="cmd-row"><div class="cmd-code">.tele del [nom]</div><div class="cmd-desc">Supprime une destination de la liste .tele</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup tele [nom]</div><div class="cmd-desc">Recherche une destination de téléportation par nom</div></div>
+    <div class="cmd-row"><div class="cmd-code">.recall [nom]</div><div class="cmd-desc">Retour à la position avant le dernier tp (soi-même ou le joueur nommé)</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Aller vers un joueur / personnage</div>
+    <div class="cmd-row"><div class="cmd-code">.game [nom]</div><div class="cmd-desc">Téléporte vous vers un joueur</div></div>
+    <div class="cmd-row"><div class="cmd-code">.goname [nom]</div><div class="cmd-desc">Téléporte vous vers un joueur (peut être hors ligne)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.namego [nom]</div><div class="cmd-desc">Téléporte un joueur vers vous (peut être hors ligne)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.groupgo [nom]</div><div class="cmd-desc">Téléporte le joueur et tout son groupe vers vous</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Coordonnées &amp; cibles précises</div>
+    <div class="cmd-row"><div class="cmd-code">.go xy [x] [y] [mapid]</div><div class="cmd-desc">Téléporte vers les coordonnées X/Y (sol/eau) sur la map spécifiée ou actuelle</div></div>
+    <div class="cmd-row"><div class="cmd-code">.go xyz [x] [y] [z] [mapid]</div><div class="cmd-desc">Téléporte vers les coordonnées X/Y/Z exactes</div></div>
+    <div class="cmd-row"><div class="cmd-code">.go zonexy [x] [y] [zone]</div><div class="cmd-desc">Téléporte vers des coordonnées client dans une zone</div></div>
+    <div class="cmd-row"><div class="cmd-code">.go grid [gridX] [gridY] [mapid]</div><div class="cmd-desc">Téléporte au centre d'une grille de map</div></div>
+    <div class="cmd-row"><div class="cmd-code">.go creature [GUID|nom|id #id]</div><div class="cmd-desc">Téléporte vers une créature via son GUID, son nom ou son entry ID</div></div>
+    <div class="cmd-row"><div class="cmd-code">.go object [GUID|nom|id #id]</div><div class="cmd-desc">Téléporte vers un gameobject via son GUID, son nom ou son entry ID</div></div>
+    <div class="cmd-row"><div class="cmd-code">.go graveyard [id]</div><div class="cmd-desc">Téléporte vers un cimetière par son ID</div></div>
+    <div class="cmd-row"><div class="cmd-code">.go taxinode [id]</div><div class="cmd-desc">Téléporte vers un nœud de taxi par son ID</div></div>
+    <div class="cmd-row"><div class="cmd-code">.go trigger [id]</div><div class="cmd-desc">Téléporte vers un areatrigger par son ID</div></div>
+  </div>
+
+</div>
+
+<!-- ========== COMBAT & GM ========== -->
+<div id="tab-combat" class="section">
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Mode GM</div>
+    <div class="cmd-row"><div class="cmd-code">.gm on / .gm off</div><div class="cmd-desc">Active ou désactive le mode GM (invisibilité aux monstres)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.gm chat on / off</div><div class="cmd-desc">Affiche ou masque le symbole Blizzard devant votre nom en chat</div></div>
+    <div class="cmd-row"><div class="cmd-code">.gm fly on / off</div><div class="cmd-desc">Active ou désactive la capacité de vol pour la cible</div></div>
+    <div class="cmd-row"><div class="cmd-code">.gm visible on / off</div><div class="cmd-desc">Rend le GM visible ou invisible pour les autres joueurs</div></div>
+    <div class="cmd-row"><div class="cmd-code">.gm ingame</div><div class="cmd-desc">Affiche la liste des GMs actuellement connectés en jeu</div></div>
+    <div class="cmd-row"><div class="cmd-code">.gm list</div><div class="cmd-desc">Affiche tous les comptes GM et leurs niveaux de sécurité</div></div>
+    <div class="cmd-row"><div class="cmd-code">.gm setview</div><div class="cmd-desc">Active la vue à la première personne sur l'unité sélectionnée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.whispers on / off</div><div class="cmd-desc">Active/désactive la réception de chuchotements de joueurs</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Combat</div>
+    <div class="cmd-row"><div class="cmd-code">.the</div><div class="cmd-desc">Tue la cible instantanément</div></div>
+    <div class="cmd-row"><div class="cmd-code">.damage [n] [école] [spellid]</div><div class="cmd-desc">Inflige n dégâts à la cible (école et sort optionnels)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.revive</div><div class="cmd-desc">Ressuscite le joueur ciblé (ou soi-même si aucun)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.respawn</div><div class="cmd-desc">Fait réapparaître la créature ciblée (ou les plus proches)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.combatstop [nom]</div><div class="cmd-desc">Arrête le combat du personnage ciblé ou du joueur nommé</div></div>
+    <div class="cmd-row"><div class="cmd-code">.cooldown [spellid]</div><div class="cmd-desc">Supprime tous les cooldowns (ou celui du sort spécifié)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.aura [spellid]</div><div class="cmd-desc">Ajoute l'aura du sort à l'unité ciblée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.unaura [spellid]</div><div class="cmd-desc">Retire l'aura du sort de l'unité ciblée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.cast [spellid] [triggered]</div><div class="cmd-desc">Lance le sort sur la cible (triggered = sans animation/coût)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.cast back [spellid]</div><div class="cmd-desc">La cible lance le sort sur vous</div></div>
+    <div class="cmd-row"><div class="cmd-code">.cast self [spellid]</div><div class="cmd-desc">La cible lance le sort sur elle-même</div></div>
+    <div class="cmd-row"><div class="cmd-code">.cast target [spellid]</div><div class="cmd-desc">La cible lance le sort sur sa propre victime</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Modificateurs</div>
+    <div class="cmd-row"><div class="cmd-code">.modify speed [n]</div><div class="cmd-desc">Modifie la vitesse de course (multiplicateur, 0.1–10)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify swim [n]</div><div class="cmd-desc">Modifie la vitesse de nage</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify fly [n]</div><div class="cmd-desc">Modifie la vitesse de vol</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify bwalk [n]</div><div class="cmd-desc">Modifie la vitesse de marche arrière</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify aspeed [n]</div><div class="cmd-desc">Modifie toutes les vitesses simultanément</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify hp [n]</div><div class="cmd-desc">Modifie les points de vie du personnage</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify mana [n]</div><div class="cmd-desc">Modifie la mana du personnage</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify energy [n]</div><div class="cmd-desc">Modifie l'énergie du personnage</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify rage [n]</div><div class="cmd-desc">Modifie la rage du personnage</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify money [n]</div><div class="cmd-desc">Modifie l'argent (valeur en cuivre, négatif pour retirer)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify morph [displayid]</div><div class="cmd-desc">Change l'apparence via un ID de modèle</div></div>
+    <div class="cmd-row"><div class="cmd-code">.demorph</div><div class="cmd-desc">Annule le morph et restaure l'apparence d'origine</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify scale [n]</div><div class="cmd-desc">Modifie la taille de la cible</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify gender male/female</div><div class="cmd-desc">Change le genre du personnage ciblé</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify drunk [0-100]</div><div class="cmd-desc">Définit le niveau d'ivresse (0 = sobre, 100 = ivre mort)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify mount [id] [speed]</div><div class="cmd-desc">Affiche le personnage en monture via un ID de créature</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify tp [n]</div><div class="cmd-desc">Définit le nombre de points de talent libres</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify rep [ID] [valeur]</div><div class="cmd-desc">Modifie la réputation avec une faction — 0 = Neutre, ~43000 = Exalté</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify faction [factionid] [flag] [npcflag] [dflag]</div><div class="cmd-desc">Modifie la faction et les flags de la créature ciblée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.modify phase [phasemask]</div><div class="cmd-desc">Change le phasemask du personnage ciblé</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Triche &amp; Exploration</div>
+    <div class="cmd-row"><div class="cmd-code">.taxicheat on / off</div><div class="cmd-desc">Débloque temporairement tous les nœuds de taxi</div></div>
+    <div class="cmd-row"><div class="cmd-code">.explorecheat 1 / 0</div><div class="cmd-desc">Révèle (1) ou masque (0) toute la carte du monde</div></div>
+    <div class="cmd-row"><div class="cmd-code">.waterwalk on / off</div><div class="cmd-desc">Permet de marcher sur l'eau au personnage ciblé</div></div>
+    <div class="cmd-row"><div class="cmd-code">.showarea [areaid]</div><div class="cmd-desc">Révèle la zone spécifiée sur la carte du personnage ciblé</div></div>
+    <div class="cmd-row"><div class="cmd-code">.hidearea [areaid]</div><div class="cmd-desc">Masque la zone spécifiée sur la carte du personnage ciblé</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Debug &amp; Sons</div>
+    <div class="cmd-row"><div class="cmd-code">.debug play sound [id]</div><div class="cmd-desc">Joue un son pour vous seul (client WoW contient 5000+ sons)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.debug play cinematic [id]</div><div class="cmd-desc">Lance une cinématique en jeu (votre caméra voyage, perso sur place)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.debug play movie [id]</div><div class="cmd-desc">Joue une vidéo cinématique</div></div>
+    <div class="cmd-row"><div class="cmd-code">.debug anim [emoteid]</div><div class="cmd-desc">Joue une émote d'animation sur votre personnage</div></div>
+    <div class="cmd-row"><div class="cmd-code">.debug arena</div><div class="cmd-desc">Active/désactive le mode debug arène (permet de démarrer seul)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.debug bg</div><div class="cmd-desc">Active/désactive le mode debug BG (permet de démarrer seul)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.movegens</div><div class="cmd-desc">Affiche la pile de générateurs de mouvement de la créature/joueur ciblé</div></div>
+    <div class="cmd-row"><div class="cmd-code">.neargrave [alliance|horde]</div><div class="cmd-desc">Trouve le cimetière le plus proche lié à la zone actuelle</div></div>
+    <div class="cmd-row"><div class="cmd-code">.wchange [type] [0/1]</div><div class="cmd-desc">Définit la météo : type 1=pluie, 2=neige, 3=sable — état 0=off, 1=on</div></div>
+    <div class="cmd-row"><div class="cmd-code">.event list</div><div class="cmd-desc">Affiche les événements du monde actuellement actifs</div></div>
+    <div class="cmd-row"><div class="cmd-code">.event start [id]</div><div class="cmd-desc">Démarre un événement du monde (changement non sauvegardé en DB)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.event stop [id]</div><div class="cmd-desc">Arrête un événement du monde</div></div>
+  </div>
+
+</div>
+
+<!-- ========== NPC & MONDE ========== -->
+<div id="tab-npc" class="section">
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Créatures — Spawn &amp; Gestion</div>
+    <div class="cmd-row"><div class="cmd-code">.npc add [entry_id]</div><div class="cmd-desc">Spawn une créature à votre position via son template ID</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc delete [guid]</div><div class="cmd-desc">Supprime la créature ciblée (ou par GUID)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc move [guid]</div><div class="cmd-desc">Déplace le point de spawn de la créature ciblée à votre position</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc changelevel [n]</div><div class="cmd-desc">Change le niveau de la créature ciblée (1–63)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc factionid [id]</div><div class="cmd-desc">Change la faction de la créature ciblée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc flag [flag]</div><div class="cmd-desc">Définit les NPC flags de la créature (et de son template)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc setmodel [displayid]</div><div class="cmd-desc">Change le modèle visuel de la créature ciblée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc setdeathstate on/off</div><div class="cmd-desc">Définit l'état de mort par défaut au spawn</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc spawndist [dist]</div><div class="cmd-desc">Ajuste la distance de spawn de la créature ciblée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc spawntime [time]</div><div class="cmd-desc">Ajuste le temps de respawn de la créature ciblée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc setphase [phasemask]</div><div class="cmd-desc">Change le phasemask de l'unité ciblée (sauvegardé en DB pour les créatures)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc tame</div><div class="cmd-desc">Apprivoise la créature ciblée (doit être apprivoisable, sans pet actuel)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc aiinfo</div><div class="cmd-desc">Affiche les informations IA et script de la créature ciblée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc info</div><div class="cmd-desc">Affiche toutes les infos détaillées du NPC ciblé</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Créatures — Mouvement &amp; Émotes</div>
+    <div class="cmd-row"><div class="cmd-code">.npc follow</div><div class="cmd-desc">La créature ciblée commence à vous suivre</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc unfollow</div><div class="cmd-desc">La créature ciblée arrête de vous suivre</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc setmovetype [guid] stay/random/way</div><div class="cmd-desc">Définit le type de mouvement de la créature (statique / aléatoire / waypoints)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc say [texte]</div><div class="cmd-desc">Fait parler la créature ciblée en chat</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc yell [texte]</div><div class="cmd-desc">Fait crier la créature ciblée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc whisper [playerguid] [texte]</div><div class="cmd-desc">La créature ciblée chuchote au joueur spécifié</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc playemote [emoteid]</div><div class="cmd-desc">Fait jouer une émote à la créature ciblée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc textemote [emoteid]</div><div class="cmd-desc">Fait jouer une textemote à la créature ciblée</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Créatures — Waypoints</div>
+    <div class="cmd-row"><div class="cmd-code">.wp add [guid]</div><div class="cmd-desc">Ajoute votre position actuelle comme waypoint pour la créature</div></div>
+    <div class="cmd-row"><div class="cmd-code">.wp show [guid] on/first/last/off/info</div><div class="cmd-desc">Affiche les waypoints visuellement en jeu</div></div>
+    <div class="cmd-row"><div class="cmd-code">.wp modify [guid] [paramètre]</div><div class="cmd-desc">Modifie un waypoint (waittime, emote, spell, text, del, move…)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.wp export [guid] [fichier]</div><div class="cmd-desc">Exporte les waypoints vers un fichier</div></div>
+    <div class="cmd-row"><div class="cmd-code">.wp import [fichier]</div><div class="cmd-desc">Importe des waypoints depuis un fichier</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Marchand NPC</div>
+    <div class="cmd-row"><div class="cmd-code">.npc additem [itemid]</div><div class="cmd-desc">Ajoute un objet à la liste du marchand ciblé</div></div>
+    <div class="cmd-row"><div class="cmd-code">.npc delitem [itemid]</div><div class="cmd-desc">Retire un objet de la liste du marchand ciblé</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">GameObjects (objets du monde)</div>
+    <div class="cmd-row"><div class="cmd-code">.gobject add [id]</div><div class="cmd-desc">Place un gameobject à votre position via son template ID</div></div>
+    <div class="cmd-row"><div class="cmd-code">.gobject delete [guid]</div><div class="cmd-desc">Supprime le gameobject par son GUID</div></div>
+    <div class="cmd-row"><div class="cmd-code">.gobject move [guid] [x y z]</div><div class="cmd-desc">Déplace le gameobject à votre position (ou aux coordonnées fournies)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.gobject turn [guid] [angle]</div><div class="cmd-desc">Fait pivoter le gameobject autour de l'axe Z</div></div>
+    <div class="cmd-row"><div class="cmd-code">.gobject near [distance]</div><div class="cmd-desc">Liste les gameobjects à portée (défaut 10 unités), triés par distance</div></div>
+    <div class="cmd-row"><div class="cmd-code">.gobject target [id|nom]</div><div class="cmd-desc">Localise et affiche la position du gameobject le plus proche</div></div>
+    <div class="cmd-row"><div class="cmd-code">.gobject setphase [guid] [phasemask]</div><div class="cmd-desc">Change le phasemask d'un gameobject (sauvegardé en DB)</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Recherche dans le monde</div>
+    <div class="cmd-row"><div class="cmd-code">.list creature [id] [max]</div><div class="cmd-desc">Liste les créatures avec cet entry ID dans le monde (défaut max 10)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.list item [id] [max]</div><div class="cmd-desc">Liste tous les emplacements de l'objet (inventaires, mails, AH, banque de guilde)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.list object [id] [max]</div><div class="cmd-desc">Liste les gameobjects avec cet entry ID dans le monde</div></div>
+    <div class="cmd-row"><div class="cmd-code">.trigger near [distance]</div><div class="cmd-desc">Liste les areatriggers à portée</div></div>
+    <div class="cmd-row"><div class="cmd-code">.trigger active</div><div class="cmd-desc">Liste les areatriggers dont la zone d'activation inclut votre position</div></div>
+  </div>
+
+</div>
+
+<!-- ========== COMPTE & SERVEUR ========== -->
+<div id="tab-account" class="section">
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Gestion des comptes</div>
+    <div class="cmd-row"><div class="cmd-code">.account</div><div class="cmd-desc">Affiche le niveau d'accès de votre compte</div></div>
+    <div class="cmd-row"><div class="cmd-code">.account create [nom] [mdp]</div><div class="cmd-desc">Crée un nouveau compte avec le mot de passe spécifié</div></div>
+    <div class="cmd-row"><div class="cmd-code">.account delete [nom]</div><div class="cmd-desc">Supprime un compte et tous ses personnages</div></div>
+    <div class="cmd-row"><div class="cmd-code">.account password [ancien] [nouveau] [nouveau]</div><div class="cmd-desc">Change le mot de passe de votre compte</div></div>
+    <div class="cmd-row"><div class="cmd-code">.account lock on/off</div><div class="cmd-desc">Restreint la connexion à l'IP actuelle (on) ou supprime la restriction (off)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.account onlinelist</div><div class="cmd-desc">Affiche la liste de tous les comptes connectés</div></div>
+    <div class="cmd-row"><div class="cmd-code">.account set gmlevel [nom] [niveau]</div><div class="cmd-desc">Définit le niveau GM d'un compte (0–3, ne peut pas s'appliquer à soi-même)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.account set addon [nom] [0/1/2]</div><div class="cmd-desc">Définit l'extension autorisée : 0=Vanilla, 1=TBC, 2=WotLK</div></div>
+    <div class="cmd-row"><div class="cmd-code">.account set password [nom] [mdp] [mdp]</div><div class="cmd-desc">Définit le mot de passe d'un compte</div></div>
+    <div class="cmd-row"><div class="cmd-code">.account characters [nom|id]</div><div class="cmd-desc">Affiche tous les personnages d'un compte</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup account name [part]</div><div class="cmd-desc">Recherche des comptes dont le nom contient la chaîne fournie</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup account email [part]</div><div class="cmd-desc">Recherche des comptes par adresse email (partielle)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.lookup account ip [part]</div><div class="cmd-desc">Recherche des comptes par dernière IP utilisée</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Bans &amp; Sanctions</div>
+    <div class="cmd-row"><div class="cmd-code">.ban account [nom] [durée] [raison]</div><div class="cmd-desc">Banni un compte et kick le joueur — durée ex: "4d20h3s", -1 = permanent</div></div>
+    <div class="cmd-row"><div class="cmd-code">.ban character [nom] [durée] [raison]</div><div class="cmd-desc">Banni le compte du personnage et le kick</div></div>
+    <div class="cmd-row"><div class="cmd-code">.ban ip [ip] [durée] [raison]</div><div class="cmd-desc">Banni une adresse IP</div></div>
+    <div class="cmd-row"><div class="cmd-code">.unban account [nom]</div><div class="cmd-desc">Lève le ban sur un compte (par pattern de nom)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.unban character [nom]</div><div class="cmd-desc">Lève le ban sur un personnage</div></div>
+    <div class="cmd-row"><div class="cmd-code">.unban ip [ip]</div><div class="cmd-desc">Lève le ban sur une IP</div></div>
+    <div class="cmd-row"><div class="cmd-code">.baninfo account [id]</div><div class="cmd-desc">Affiche les informations complètes sur un ban de compte</div></div>
+    <div class="cmd-row"><div class="cmd-code">.baninfo character [nom]</div><div class="cmd-desc">Affiche les informations complètes sur un ban de personnage</div></div>
+    <div class="cmd-row"><div class="cmd-code">.baninfo ip [ip]</div><div class="cmd-desc">Affiche les informations complètes sur un ban d'IP</div></div>
+    <div class="cmd-row"><div class="cmd-code">.banlist account [nom]</div><div class="cmd-desc">Liste les bans de comptes (filtré par pattern si fourni)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.banlist character [nom]</div><div class="cmd-desc">Liste les bans de personnages</div></div>
+    <div class="cmd-row"><div class="cmd-code">.banlist ip [ip]</div><div class="cmd-desc">Liste les bans d'IP</div></div>
+    <div class="cmd-row"><div class="cmd-code">.kick [nom]</div><div class="cmd-desc">Kick le joueur du serveur (ciblé si aucun nom fourni)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.mute [nom] [minutes]</div><div class="cmd-desc">Coupe le chat du joueur pour X minutes</div></div>
+    <div class="cmd-row"><div class="cmd-code">.unmute [nom]</div><div class="cmd-desc">Rétablit le chat du joueur</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Tickets de support</div>
+    <div class="cmd-row"><div class="cmd-code">.ticket on / off</div><div class="cmd-desc">Active/désactive l'affichage des nouveaux tickets pour les GMs</div></div>
+    <div class="cmd-row"><div class="cmd-code">.ticket [n]</div><div class="cmd-desc">Affiche le ticket numéro n</div></div>
+    <div class="cmd-row"><div class="cmd-code">.ticket [nom]</div><div class="cmd-desc">Affiche le ticket du personnage nommé</div></div>
+    <div class="cmd-row"><div class="cmd-code">.ticket respond [n] [réponse]</div><div class="cmd-desc">Répond au ticket numéro n</div></div>
+    <div class="cmd-row"><div class="cmd-code">.delticket all</div><div class="cmd-desc">Supprime tous les tickets du serveur</div></div>
+    <div class="cmd-row"><div class="cmd-code">.delticket [n]</div><div class="cmd-desc">Supprime le ticket numéro n</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Gestion du serveur</div>
+    <div class="cmd-row"><div class="cmd-code">.server info</div><div class="cmd-desc">Affiche la version du serveur et le nombre de joueurs connectés</div></div>
+    <div class="cmd-row"><div class="cmd-code">.server motd</div><div class="cmd-desc">Affiche le message du jour du serveur</div></div>
+    <div class="cmd-row"><div class="cmd-code">.server set motd [texte]</div><div class="cmd-desc">Définit le message du jour du serveur</div></div>
+    <div class="cmd-row"><div class="cmd-code">.server shutdown [délai]</div><div class="cmd-desc">Arrête le serveur après X secondes</div></div>
+    <div class="cmd-row"><div class="cmd-code">.server shutdown cancel</div><div class="cmd-desc">Annule le timer d'arrêt/redémarrage en cours</div></div>
+    <div class="cmd-row"><div class="cmd-code">.server restart [délai]</div><div class="cmd-desc">Redémarre le serveur après X secondes</div></div>
+    <div class="cmd-row"><div class="cmd-code">.server restart cancel</div><div class="cmd-desc">Annule le timer de redémarrage</div></div>
+    <div class="cmd-row"><div class="cmd-code">.server idleshutdown [délai]</div><div class="cmd-desc">Arrêt auto si aucun joueur connecté après X secondes</div></div>
+    <div class="cmd-row"><div class="cmd-code">.server idlerestart [délai]</div><div class="cmd-desc">Redémarrage auto si aucun joueur connecté après X secondes</div></div>
+    <div class="cmd-row"><div class="cmd-code">.server plimit [n]</div><div class="cmd-desc">Affiche ou définit le nombre maximum de joueurs autorisés</div></div>
+    <div class="cmd-row"><div class="cmd-code">.server log level [0-3]</div><div class="cmd-desc">Définit le niveau de log (0=erreurs, 1=basique, 2=détaillé, 3=debug)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.server exit</div><div class="cmd-desc">Termine mangosd immédiatement (exit code 0)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.reload all</div><div class="cmd-desc">Recharge toutes les tables supportant le rechargement à chaud</div></div>
+    <div class="cmd-row"><div class="cmd-code">.reload config</div><div class="cmd-desc">Recharge le fichier de configuration mangosd.conf</div></div>
+    <div class="cmd-row"><div class="cmd-code">.reload all_loot</div><div class="cmd-desc">Recharge toutes les tables de loot (peut causer des lags)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.reload all_scripts</div><div class="cmd-desc">Recharge toutes les tables *_scripts</div></div>
+    <div class="cmd-row"><div class="cmd-code">.loadscripts [nom]</div><div class="cmd-desc">Décharge et recharge la bibliothèque de scripts (ou recharge l'actuelle)</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">Personnages supprimés</div>
+    <div class="cmd-row"><div class="cmd-code">.character deleted list [guid|nom]</div><div class="cmd-desc">Liste les personnages supprimés (filtrés par GUID ou nom si fourni)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.character deleted restore [guid|nom] [nouveau_nom] [compte]</div><div class="cmd-desc">Restaure un personnage supprimé (optionnellement avec un nouveau nom/compte)</div></div>
+    <div class="cmd-row"><div class="cmd-code">.character deleted delete [guid|nom]</div><div class="cmd-desc">Supprime définitivement un personnage de la liste des supprimés</div></div>
+    <div class="cmd-row"><div class="cmd-code">.character deleted old [jours]</div><div class="cmd-desc">Supprime définitivement tous les personnages supprimés depuis plus de X jours</div></div>
+    <div class="cmd-row"><div class="cmd-code">.character erase [nom]</div><div class="cmd-desc">Supprime définitivement un personnage (ignore les options de suppression)</div></div>
+  </div>
+
+</div>
+
+<!-- ========== RÉPUTATIONS ========== -->
+<div id="tab-rep" class="section">
+  <div class="note">Commande : <code>.modify rep [ID faction] [valeur]</code> — 0 = Neutre · ~3000 = Amical · ~9000 = Honorable · ~21000 = Révéré · ~42000 = Exalté</div>
+
+  <div class="rep-section-label"><span class="rep-badge alliance">Alliance</span></div>
+  <div class="rep-grid">
+    <div class="rep-card"><div class="rep-name">Darnassus</div><div class="rep-id">ID: 69</div></div>
+    <div class="rep-card"><div class="rep-name">L'Exodar</div><div class="rep-id">ID: 930</div></div>
+    <div class="rep-card"><div class="rep-name">Forgefer</div><div class="rep-id">ID: 47</div></div>
+    <div class="rep-card"><div class="rep-name">Gnomes de Gnomeregan</div><div class="rep-id">ID: 54</div></div>
+    <div class="rep-card"><div class="rep-name">Hurlevent</div><div class="rep-id">ID: 72</div></div>
+  </div>
+
+  <div class="rep-section-label"><span class="rep-badge horde">Horde</span></div>
+  <div class="rep-grid">
+    <div class="rep-card"><div class="rep-name">Blaireau-Tonnerre</div><div class="rep-id">ID: 81</div></div>
+    <div class="rep-card"><div class="rep-name">Trolls Sombrelance</div><div class="rep-id">ID: 530</div></div>
+    <div class="rep-card"><div class="rep-name">Orgrimmar</div><div class="rep-id">ID: 76</div></div>
+    <div class="rep-card"><div class="rep-name">Lune-d'Argent</div><div class="rep-id">ID: 911</div></div>
+    <div class="rep-card"><div class="rep-name">Undercity</div><div class="rep-id">ID: 68</div></div>
+  </div>
+
+  <div class="rep-section-label"><span class="rep-badge neutral">Classic — Général</span></div>
+  <div class="rep-grid">
+    <div class="rep-card"><div class="rep-name">Aube de l'Argent</div><div class="rep-id">ID: 529</div></div>
+    <div class="rep-card"><div class="rep-name">Boucaniers Sceau de Sang</div><div class="rep-id">ID: 87</div></div>
+    <div class="rep-card"><div class="rep-name">Couvée de Nozdormu</div><div class="rep-id">ID: 910</div></div>
+    <div class="rep-card"><div class="rep-name">Foire de Sombrelune</div><div class="rep-id">ID: 909</div></div>
+    <div class="rep-card"><div class="rep-name">Clan Gelkis</div><div class="rep-id">ID: 92</div></div>
+    <div class="rep-card"><div class="rep-name">Bois-du-Val</div><div class="rep-id">ID: 576</div></div>
+    <div class="rep-card"><div class="rep-name">Hydraxien</div><div class="rep-id">ID: 749</div></div>
+    <div class="rep-card"><div class="rep-name">Clan Magram</div><div class="rep-id">ID: 93</div></div>
+    <div class="rep-card"><div class="rep-name">Ravenholdt</div><div class="rep-id">ID: 349</div></div>
+    <div class="rep-card"><div class="rep-name">Shen'dralar</div><div class="rep-id">ID: 809</div></div>
+    <div class="rep-card"><div class="rep-name">Fraternité du Thorium</div><div class="rep-id">ID: —</div></div>
+    <div class="rep-card"><div class="rep-name">Cercle du Cénarius</div><div class="rep-id">ID: —</div></div>
+    <div class="rep-card"><div class="rep-name">Tribu des Zandalari</div><div class="rep-id">ID: —</div></div>
+  </div>
+
+  <div class="rep-section-label"><span class="rep-badge neutral">Burning Crusade</span></div>
+  <div class="rep-grid">
+    <div class="rep-card"><div class="rep-name">Le Consortium</div><div class="rep-id">ID: 933</div></div>
+    <div class="rep-card"><div class="rep-name">L'Œil Violet</div><div class="rep-id">ID: 967</div></div>
+    <div class="rep-card"><div class="rep-name">Les Mag'har</div><div class="rep-id">ID: 941</div></div>
+    <div class="rep-card"><div class="rep-name">Gardiens du Sable</div><div class="rep-id">ID: 990</div></div>
+    <div class="rep-card"><div class="rep-name">La Ville-Honneur</div><div class="rep-id">ID: 946</div></div>
+    <div class="rep-card"><div class="rep-name">Expédition Cénarion</div><div class="rep-id">ID: 942</div></div>
+    <div class="rep-card"><div class="rep-name">Gardiens du Temps</div><div class="rep-id">ID: 989</div></div>
+    <div class="rep-card"><div class="rep-name">Kurenai</div><div class="rep-id">ID: 978</div></div>
+    <div class="rep-card"><div class="rep-name">Nether-Défenseurs</div><div class="rep-id">ID: 1015</div></div>
+    <div class="rep-card"><div class="rep-name">Ogri'la</div><div class="rep-id">ID: 1038</div></div>
+    <div class="rep-card"><div class="rep-name">Sporeggar</div><div class="rep-id">ID: 970</div></div>
+    <div class="rep-card"><div class="rep-name">Thrallmar</div><div class="rep-id">ID: 947</div></div>
+    <div class="rep-card"><div class="rep-name">Offensive Soleil Brisé</div><div class="rep-id">ID: 1077</div></div>
+    <div class="rep-card"><div class="rep-name">Les Aldor</div><div class="rep-id">ID: 932</div></div>
+    <div class="rep-card"><div class="rep-name">Les Voyants</div><div class="rep-id">ID: 934</div></div>
+    <div class="rep-card"><div class="rep-name">Le Sha'tar</div><div class="rep-id">ID: 935</div></div>
+    <div class="rep-card"><div class="rep-name">Bas-Quartier</div><div class="rep-id">ID: 1011</div></div>
+  </div>
+
+  <div class="rep-section-label"><span class="rep-badge alliance">Forces armées Alliance</span></div>
+  <div class="rep-grid">
+    <div class="rep-card"><div class="rep-name">Ligue d'Arathor</div><div class="rep-id">ID: 509</div></div>
+    <div class="rep-card"><div class="rep-name">Ailes d'Argent</div><div class="rep-id">ID: 890</div></div>
+    <div class="rep-card"><div class="rep-name">Garde Frostlance</div><div class="rep-id">ID: 730</div></div>
+  </div>
+
+  <div class="rep-section-label"><span class="rep-badge horde">Forces armées Horde</span></div>
+  <div class="rep-grid">
+    <div class="rep-card"><div class="rep-name">Clan Loup-de-Givre</div><div class="rep-id">ID: 729</div></div>
+    <div class="rep-card"><div class="rep-name">Clan Vaisseaux de Guerre</div><div class="rep-id">ID: 889</div></div>
+  </div>
+
+  <div class="rep-section-label"><span class="rep-badge neutral">Steamwheedle / Divers</span></div>
+  <div class="rep-grid">
+    <div class="rep-card"><div class="rep-name">Baie-du-Butin</div><div class="rep-id">ID: 21</div></div>
+    <div class="rep-card"><div class="rep-name">Gadgetzan</div><div class="rep-id">ID: 369</div></div>
+    <div class="rep-card"><div class="rep-name">Ratchet</div><div class="rep-id">ID: 470</div></div>
+    <div class="rep-card"><div class="rep-name">Attente Éternelle</div><div class="rep-id">ID: 577</div></div>
+    <div class="rep-card"><div class="rep-name">Syndicat</div><div class="rep-id">ID: 70</div></div>
+    <div class="rep-card"><div class="rep-name">Clan Wildhammer</div><div class="rep-id">ID: 471</div></div>
+    <div class="rep-card"><div class="rep-name">Musardin d'Hiver</div><div class="rep-id">ID: 589</div></div>
+  </div>
+</div>
+
+<!-- ========== MACROS ========== -->
+<div id="tab-macros" class="section">
+  <div class="note">Copiez-collez ces blocs dans la console GM pour monter toutes les réputations d'un groupe d'un coup.</div>
+  <div class="macro-grid">
+    <div class="macro-card"><div class="macro-header"><span class="macro-title">Alliance Classic</span><button class="copy-btn" onclick="copyMacro(this)">Copier</button></div><div class="macro-body">.mod rep 69 999999
+.mod rep 930 999999
+.mod rep 1134 999999
+.mod rep 54 999999
+.mod rep 47 999999
+.mod rep 890 999999
+.mod rep 730 999999
+.mod rep 72 999999
+.mod rep 509 999999
+.mod rep 589 999999</div></div>
+
+    <div class="macro-card"><div class="macro-header"><span class="macro-title">Horde Classic</span><button class="copy-btn" onclick="copyMacro(this)">Copier</button></div><div class="macro-body">.mod rep 1133 999999
+.mod rep 530 999999
+.mod rep 729 999999
+.mod rep 76 999999
+.mod rep 911 999999
+.mod rep 510 999999
+.mod rep 81 999999
+.mod rep 922 999999
+.mod rep 68 999999
+.mod rep 889 999999</div></div>
+
+    <div class="macro-card"><div class="macro-header"><span class="macro-title">Classic Général 1</span><button class="copy-btn" onclick="copyMacro(this)">Copier</button></div><div class="macro-body">.mod rep 529 99999
+.mod rep 87 99999
+.mod rep 21 99999
+.mod rep 910 99999
+.mod rep 609 99999
+.mod rep 909 99999
+.mod rep 369 99999
+.mod rep 577 99999
+.mod rep 92 99999
+.mod rep 749 99999
+.mod rep 93 99999
+.mod rep 470 99999
+.mod rep 349 99999</div></div>
+
+    <div class="macro-card"><div class="macro-header"><span class="macro-title">Classic Général 2</span><button class="copy-btn" onclick="copyMacro(this)">Copier</button></div><div class="macro-body">.mod rep 809 99999
+.mod rep 59 99999
+.mod rep 576 99999
+.mod rep 270 99999
+.mod rep 70 99999</div></div>
+
+    <div class="macro-card"><div class="macro-header"><span class="macro-title">BC — Alliance</span><button class="copy-btn" onclick="copyMacro(this)">Copier</button></div><div class="macro-body">.mod rep 946 99999
+.mod rep 978 99999
+.mod rep 942 99999
+.mod rep 1012 99999</div></div>
+
+    <div class="macro-card"><div class="macro-header"><span class="macro-title">BC — Horde</span><button class="copy-btn" onclick="copyMacro(this)">Copier</button></div><div class="macro-body">.mod rep 941 99999
+.mod rep 947 99999
+.mod rep 942 99999
+.mod rep 1012 99999</div></div>
+
+    <div class="macro-card"><div class="macro-header"><span class="macro-title">BC — Général</span><button class="copy-btn" onclick="copyMacro(this)">Copier</button></div><div class="macro-body">.mod rep 967 99999
+.mod rep 935 99999
+.mod rep 934 99999
+.mod rep 990 99999
+.mod rep 933 99999
+.mod rep 932 99999
+.mod rep 970 99999
+.mod rep 1077 99999
+.mod rep 1031 99999
+.mod rep 1038 99999
+.mod rep 1011 99999
+.mod rep 1015 99999
+.mod rep 989 99999</div></div>
+
+    <div class="macro-card"><div class="macro-header"><span class="macro-title">WotLK — Alliance</span><button class="copy-btn" onclick="copyMacro(this)">Copier</button></div><div class="macro-body">.mod rep 1037 99999
+.mod rep 1068 99999
+.mod rep 1126 99999
+.mod rep 1094 99999
+.mod rep 1050 99999</div></div>
+
+    <div class="macro-card"><div class="macro-header"><span class="macro-title">WotLK — Horde</span><button class="copy-btn" onclick="copyMacro(this)">Copier</button></div><div class="macro-body">.mod rep 1052 99999
+.mod rep 1067 99999
+.mod rep 1124 99999
+.mod rep 1064 99999
+.mod rep 1085 99999</div></div>
+
+    <div class="macro-card"><div class="macro-header"><span class="macro-title">WotLK — Général</span><button class="copy-btn" onclick="copyMacro(this)">Copier</button></div><div class="macro-body">.mod rep 1106 99999
+.mod rep 1104 99999
+.mod rep 1090 99999
+.mod rep 1098 99999
+.mod rep 1156 99999
+.mod rep 1073 99999
+.mod rep 1105 99999
+.mod rep 1119 99999
+.mod rep 1091 99999</div></div>
+  </div>
+</div>
+
+<!-- ========== PROFESSIONS ========== -->
+<div id="tab-professions" class="section">
+  <div class="note">
+    Apprendre une profession : <code>.learn [ID learn]</code><br>
+    Monter le skill au max : <code>.setskill [ID skill] 375 375</code><br>
+    Toutes les recettes d'un coup : <code>.learn all_recipes [nom en anglais]</code>
+  </div>
+  <div class="prof-section-label">Professions principales</div>
+  <div class="prof-grid">
+    <div class="prof-card"><div class="prof-name">Forge</div><div class="prof-ids"><span><span class="id-label">learn</span> 2018</span><span><span class="id-label">skill</span> 164</span></div></div>
+    <div class="prof-card"><div class="prof-name">Enchantement</div><div class="prof-ids"><span><span class="id-label">learn</span> 7411</span><span><span class="id-label">skill</span> 333</span></div></div>
+    <div class="prof-card"><div class="prof-name">Ingénierie</div><div class="prof-ids"><span><span class="id-label">learn</span> 4036</span><span><span class="id-label">skill</span> 202</span></div></div>
+    <div class="prof-card"><div class="prof-name">Herboristerie</div><div class="prof-ids"><span><span class="id-label">learn</span> 2366</span><span><span class="id-label">skill</span> 182</span></div></div>
+    <div class="prof-card"><div class="prof-name">Joaillerie</div><div class="prof-ids"><span><span class="id-label">learn</span> 25229</span><span><span class="id-label">skill</span> 755</span></div></div>
+    <div class="prof-card"><div class="prof-name">Travail du cuir</div><div class="prof-ids"><span><span class="id-label">learn</span> 2108</span><span><span class="id-label">skill</span> 165</span></div></div>
+    <div class="prof-card"><div class="prof-name">Minage</div><div class="prof-ids"><span><span class="id-label">learn</span> 2575</span><span><span class="id-label">skill</span> 186</span></div></div>
+    <div class="prof-card"><div class="prof-name">Pelleterie</div><div class="prof-ids"><span><span class="id-label">learn</span> 8613</span><span><span class="id-label">skill</span> 393</span></div></div>
+    <div class="prof-card"><div class="prof-name">Couture</div><div class="prof-ids"><span><span class="id-label">learn</span> 3908</span><span><span class="id-label">skill</span> 197</span></div></div>
+    <div class="prof-card"><div class="prof-name">Calligraphie</div><div class="prof-ids"><span><span class="id-label">learn</span> 45357</span><span><span class="id-label">skill</span> 773</span></div></div>
+    <div class="prof-card"><div class="prof-name">Alchimie</div><div class="prof-ids"><span><span class="id-label">learn</span> 2259</span><span><span class="id-label">skill</span> 171</span></div></div>
+  </div>
+  <div class="prof-section-label" style="margin-top:1.5rem">Professions secondaires</div>
+  <div class="prof-grid">
+    <div class="prof-card"><div class="prof-name">Cuisine</div><div class="prof-ids"><span><span class="id-label">learn</span> 2550</span><span><span class="id-label">skill</span> 185</span></div></div>
+    <div class="prof-card"><div class="prof-name">Pêche</div><div class="prof-ids"><span><span class="id-label">learn</span> 7620</span><span><span class="id-label">skill</span> 356</span></div></div>
+    <div class="prof-card"><div class="prof-name">Premiers secours</div><div class="prof-ids"><span><span class="id-label">learn</span> 3279</span><span><span class="id-label">skill</span> 129</span></div></div>
+  </div>
+</div>
+
+</main>
+<footer>cMaNGOS GM Commands · TBC 2.4.3 · Référence complète en français</footer>
+
+<script>
+function showTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResults').style.display = 'none';
+}
+
+function copyMacro(btn) {
+  const text = btn.closest('.macro-card').querySelector('.macro-body').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copié !'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 1800);
+  });
+}
+
+function doSearch(q) {
+  const sr = document.getElementById('searchResults');
+  q = q.trim().toLowerCase();
+  if (q.length < 2) {
+    sr.style.display = 'none';
+    return;
+  }
+  // Collect all cmd-rows from all tabs
+  const allRows = document.querySelectorAll('#tab-general .cmd-row, #tab-tp .cmd-row, #tab-combat .cmd-row, #tab-npc .cmd-row, #tab-account .cmd-row');
+  let html = '';
+  let count = 0;
+  allRows.forEach(row => {
+    const code = row.querySelector('.cmd-code');
+    const desc = row.querySelector('.cmd-desc');
+    if (!code || !desc) return;
+    const combined = (code.textContent + ' ' + desc.textContent).toLowerCase();
+    if (combined.includes(q)) {
+      count++;
+      const hl = (t) => t.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'), m => '<mark style="background:rgba(200,168,75,0.3);color:var(--gold-light);border-radius:2px">'+m+'</mark>');
+      html += `<div class="cmd-row"><div class="cmd-code">${hl(code.textContent)}</div><div class="cmd-desc">${hl(desc.textContent)}</div></div>`;
+    }
+  });
+  if (count === 0) {
+    sr.innerHTML = '<div class="no-results">Aucune commande trouvée pour "' + q + '"</div>';
+  } else {
+    sr.innerHTML = `<div class="cmd-group"><div class="cmd-group-title">${count} résultat${count>1?'s':''} pour "${q}"</div>${html}</div>`;
+  }
+  sr.style.display = 'block';
+}
+</script>
+</body>
+</html>
